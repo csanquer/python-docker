@@ -1,0 +1,20 @@
+---
+version: '2'
+services:
+    python:
+        build:
+            context: ./python
+            dockerfile: Dockerfile_py${PY_VERSION}
+        volumes:
+            - "./volumes/apps:/srv/apps"
+        environment:
+            GIT_USER_NAME:
+            GIT_USER_EMAIL:
+            USER_ID:
+            GROUP_ID:
+            USERNAME: dev
+            GROUPNAME: dev
+            HOMEDIR:
+            SSH_PRIVATE_KEY:
+            SSH_PUBLIC_KEY:
+        working_dir: "/srv/apps"

@@ -1,0 +1,32 @@
+FROM python:2.7
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    ca-certificates \
+    wget \
+    git \
+    sudo
+
+ENV GOSU_VERSION 1.10
+RUN set -x \
+    && dpkgArch="$(dpkg --print-architecture | awk -F- '{ print $NF }')" \
+    && wget -O /usr/local/bin/gosu "https://github.com/tianon/gosu/releases/download/$GOSU_VERSION/gosu-$dpkgArch" \
+    && chmod +x /usr/local/bin/gosu \
+    && gosu nobody true
+
+RUN pip install \
+    tox \
+    pytest \
+    coverage \
+    virtualenv
+
+RUN groupadd -f -g 900 admin
+RUN echo '%admin ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers
+
+COPY ssh_config /ssh_config
+
+COPY docker-entrypoint.sh /entrypoint.sh
+RUN chmod a+x /entrypoint.sh && chown root:root /entrypoint.sh
+
+ENTRYPOINT ["/entrypoint.sh"]
+
+WORKDIR /srv/apps
